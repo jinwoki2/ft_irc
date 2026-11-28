@@ -1,8 +1,8 @@
 #include "IrcCaseMapping.hpp"
 
-/**
- * normalize, equals
- */
+/* ------------------------------------------------------------------------- */
+//	normalize, equals	  
+/* ------------------------------------------------------------------------- */
 
 static bool	isUpper(char c)
 {
@@ -44,9 +44,9 @@ bool	IrcCaseMapping::equals(const std::string& a, const std::string& b)
 	return (normalize(a) == normalize(b));
 }
 
-/**
- * isValidNickname
- */
+/* ------------------------------------------------------------------------- */
+//	isValidNickname
+/* ------------------------------------------------------------------------- */
 
 static bool	isValidLength(const std::string& nick)
 {
@@ -94,3 +94,34 @@ bool	IrcCaseMapping::isValidNickname(const std::string& nick)
 			isValidSetOfAscii(nick));
 }
 
+/* ------------------------------------------------------------------------- */
+//	isValidChannelName  
+/* ------------------------------------------------------------------------- */
+
+static bool	isValidChannelNameLength(const std::string& channelName)
+{
+	return (2 <= channelName.size() && channelName.size() <= 50);
+}
+
+static bool	isValidChannelNamePrefix(const char& c)
+{
+	return (c == '#' || c == '&');
+}
+
+static bool	isValidSetOfChannelNameChar(const std::string& channelName)
+{
+	std::string setOfInvalidChar("\0\x07\n\r ,:", 7);
+
+	for (std::string::const_iterator it = channelName.begin(); it != channelName.end(); ++it){
+		if (setOfInvalidChar.find(*it) != std::string::npos)
+			return (false);
+	}
+	return (true);
+}
+
+bool	IrcCaseMapping::isValidChannelName(const std::string& channelName)
+{
+	return (isValidChannelNameLength(channelName) &&
+			isValidChannelNamePrefix(channelName[0]) &&
+			isValidSetOfChannelNameChar(channelName));
+}

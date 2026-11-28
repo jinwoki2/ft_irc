@@ -57,3 +57,49 @@ TEST(IrcCaseMapping, isValidNickname)
 	CHECK_FALSE(IrcCaseMapping::isValidNickname("a234567890"));
 
 }
+
+/**
+ * RFC 2812 1.3 / 2.3.1
+ *
+ * "Channels names are strings 
+ * (beginning with a '&', '#', '+' or '!'character) 
+ * of length up to fifty (50) characters." (ft_irc: '#' / '&')
+ *
+ * channel    = ( "#" / "&" ) chanstring
+ * chanstring = %x01-07 / %x08-09 / %x0B-0C / %x0E-1F / %x21-2B / %x2D-39 / %x3B-FF
+ *              ; any octet except NUL, BELL, CR, LF, " ", "," and ":"
+ */
+
+TEST(IrcCaseMapping, isValidChannelName)
+{
+	std::string	body = "";
+	for (int c = 0; c <= 255; ++c) {
+		if (c == '\0' || c == '\x07' || c == '\n' || c == '\r'
+			|| c == ' ' || c == ',' || c == ':')
+			continue;
+		body += static_cast<char>(c);
+		if (body.size() == 49) {
+			CHECK_TRUE(IrcCaseMapping::isValidChannelName("#" + body));
+			CHECK_TRUE(IrcCaseMapping::isValidChannelName("&" + body));
+			body = "";
+		}
+	}
+	if (!body.empty()) {
+		CHECK_TRUE(IrcCaseMapping::isValidChannelName("#" + body));
+		CHECK_TRUE(IrcCaseMapping::isValidChannelName("&" + body));
+	}
+
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName(""));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("&"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("42"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("text"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName(std::string(50, 'a')));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName(std::string("#a") + '\0' + 'b'));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#a\x07" "b"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#a\nb"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#a\rb"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#a b"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#a,b"));
+	CHECK_FALSE(IrcCaseMapping::isValidChannelName("#a:b"));
+}
