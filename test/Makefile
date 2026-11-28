@@ -9,12 +9,15 @@ CPPFLAGS	= -I../include -isystem $(CPPUTEST_HOME)/include
 LDFLAGS		= -L$(CPPUTEST_HOME)/lib
 LDLIBS		= -lCppUTestExt -lCppUTest
 
+PROD_SRCDIR		= ../src
 OBJDIR		= objs
 
 TEST_SRCS	= AllTest.cpp \
-			  SmokeTest.cpp
+			  SmokeTest.cpp \
+			  TestDoublesTest.cpp \
+			  IrcCaseMappingTest.cpp
 
-PROD_SRCS	=
+PROD_SRCS	= $(PROD_SRCDIR)/IrcCaseMapping.cpp
 
 TEST_OBJS	= $(TEST_SRCS:%.cpp=$(OBJDIR)/%.o)
 PROD_OBJS	= $(PROD_SRCS:../src/%.cpp=$(OBJDIR)/src_%.o)

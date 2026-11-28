@@ -1,0 +1,6 @@
+.vscode/
+objs/
+run_tests
+*.o
+ircserv
+ref/
